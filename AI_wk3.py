@@ -3,7 +3,7 @@
 # Author: 
 #1. WYCLIFFE AROMBO
 #2.Peter Ater Chan
-#3. 
+#3. Terry nyambura Mugure
 #4. 
 # Frameworks Used: Scikit-learn, TensorFlow, spaCy
 # =========================================================
@@ -133,6 +133,7 @@ for text in reviews:
     sentiment = TextBlob(text).sentiment.polarity
     sentiment_label = "Positive" if sentiment > 0 else "Negative" if sentiment < 0 else "Neutral"
     print("Sentiment:", sentiment_label)
+
 
 
 
