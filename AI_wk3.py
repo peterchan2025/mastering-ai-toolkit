@@ -1,6 +1,10 @@
 # =========================================================
 # AI Tools Assignment - "Mastering the AI Toolkit"
-# Author(s): Your Group Names
+# Author: 
+#1. WYCLIFFE AROMBO
+#2.
+#3. 
+#4. 
 # Frameworks Used: Scikit-learn, TensorFlow, spaCy
 # =========================================================
 
@@ -129,4 +133,5 @@ for text in reviews:
     sentiment = TextBlob(text).sentiment.polarity
     sentiment_label = "Positive" if sentiment > 0 else "Negative" if sentiment < 0 else "Neutral"
     print("Sentiment:", sentiment_label)
+
 
