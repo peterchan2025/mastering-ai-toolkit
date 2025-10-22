@@ -1,10 +1,10 @@
 # =========================================================
 # AI Tools Assignment - "Mastering the AI Toolkit"
-# Author: 
-#1. WYCLIFFE AROMBO
-#2.Peter Ater Chan
-#3. Terry nyambura Mugure
-#4. 
+# Authors:
+# 1. WYCLIFFE AROMBO
+# 2. Peter Ater Chan
+# 3. Terry Nyambura Mugure
+#
 # Frameworks Used: Scikit-learn, TensorFlow, spaCy
 # =========================================================
 
@@ -46,9 +46,9 @@ clf.fit(X_train, y_train)
 # Evaluate model
 y_pred = clf.predict(X_test)
 print("=== Decision Tree Evaluation ===")
-print("Accuracy:", accuracy_score(y_test, y_pred))
-print("Precision:", precision_score(y_test, y_pred, average='weighted'))
-print("Recall:", recall_score(y_test, y_pred, average='weighted'))
+print("Accuracy:", round(accuracy_score(y_test, y_pred), 3))
+print("Precision:", round(precision_score(y_test, y_pred, average='weighted'), 3))
+print("Recall:", round(recall_score(y_test, y_pred, average='weighted'), 3))
 print("\nClassification Report:\n", classification_report(y_test, y_pred))
 
 # ---------------------------------------------------------
@@ -59,15 +59,17 @@ print("\nClassification Report:\n", classification_report(y_test, y_pred))
 
 import tensorflow as tf
 from tensorflow.keras import layers, models
+from tensorflow.keras.callbacks import TensorBoard
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime, os
 
 # Load MNIST dataset
 (X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
 
 # Normalize and reshape
-X_train = X_train.reshape(-1, 28, 28, 1) / 255.0
-X_test = X_test.reshape(-1, 28, 28, 1) / 255.0
+X_train = X_train.reshape(-1, 28, 28, 1).astype("float32") / 255.0
+X_test = X_test.reshape(-1, 28, 28, 1).astype("float32") / 255.0
 
 # Define CNN model
 model = models.Sequential([
@@ -85,13 +87,28 @@ model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 
-# Train model
-history = model.fit(X_train, y_train, epochs=5, validation_split=0.1)
+# ---------------------------------------------------------
+# TensorBoard Integration (Fixed Directory)
+# ---------------------------------------------------------
+os.makedirs("logs/fit", exist_ok=True)
+log_dir = "logs/fit/latest_run_" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-# Evaluate
-test_loss, test_acc = model.evaluate(X_test, y_test)
+# Train model
+print("\n=== Training CNN Model on MNIST Dataset ===")
+history = model.fit(
+    X_train, y_train,
+    epochs=5,
+    batch_size=128,
+    validation_split=0.1,
+    callbacks=[tensorboard_callback],
+    verbose=2
+)
+
+# Evaluate model
+test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
 print("\n=== CNN Model Evaluation ===")
-print("Test Accuracy:", test_acc)
+print("Test Accuracy:", round(test_acc, 4))
 
 # Visualize predictions
 predictions = model.predict(X_test[:5])
@@ -101,6 +118,7 @@ for i in range(5):
     plt.imshow(X_test[i].reshape(28,28), cmap='gray')
     plt.title(f"Pred: {np.argmax(predictions[i])}\nTrue: {y_test[i]}")
     plt.axis('off')
+plt.tight_layout()
 plt.show()
 
 # ---------------------------------------------------------
@@ -113,7 +131,13 @@ import spacy
 from textblob import TextBlob
 
 # Load spaCy model
-nlp = spacy.load("en_core_web_sm")
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    print("\nDownloading 'en_core_web_sm' model for spaCy...")
+    from spacy.cli import download
+    download("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
 
 # Example text data
 reviews = [
@@ -133,7 +157,3 @@ for text in reviews:
     sentiment = TextBlob(text).sentiment.polarity
     sentiment_label = "Positive" if sentiment > 0 else "Negative" if sentiment < 0 else "Neutral"
     print("Sentiment:", sentiment_label)
-
-
-
-
